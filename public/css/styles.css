@@ -1,0 +1,88 @@
+/*
+ * Art Auction - Shared Styles
+ * Mobile-first responsive design
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes */
+.hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .host-container {
+    padding: 10px;
+  }
+
+  .header h1 {
+    font-size: 2rem !important;
+  }
+
+  .room-code {
+    font-size: 3rem !important;
+    letter-spacing: 5px !important;
+  }
+
+  .auction-info {
+    grid-template-columns: 1fr !important;
+  }
+
+  .leaderboard-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .score-info {
+    text-align: center !important;
+    margin-top: 10px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .btn,
+  .control-buttons {
+    display: none;
+  }
+}
