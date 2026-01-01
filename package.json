@@ -1,7 +1,7 @@
 {
-  "name": "art-auction-game",
+  "name": "bodbjanar",
   "version": "1.0.0",
-  "description": "Jackbox-style Art Auction multiplayer game",
+  "description": "Jackbox-style multiplayer art auction game - Boðbjánar",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

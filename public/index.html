@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Art Auction - Player</title>
+  <title>Boðbjánar - Player</title>
   <link rel="stylesheet" href="/css/styles.css">
   <style>
     * {
@@ -301,7 +301,7 @@
   <div class="player-container">
     <!-- Header -->
     <div class="header">
-      <h1>🎨 ART AUCTION 🎨</h1>
+      <h1>🎨 BOÐBJÁNAR 🎨</h1>
     </div>
 
     <!-- Join Screen -->
@@ -345,6 +345,11 @@
     <div id="drawing-screen" class="hidden">
       <div class="card">
         <h2 style="text-align: center; margin-top: 0;">🎨 Create Your Art 🎨</h2>
+
+        <div class="hint-box">
+          <h4 id="promptProgress">Artwork 1 of 2</h4>
+          <p id="currentPrompt" style="font-size: 1.3rem;">Loading prompt...</p>
+        </div>
 
         <div class="canvas-container">
           <canvas id="drawingCanvas"></canvas>

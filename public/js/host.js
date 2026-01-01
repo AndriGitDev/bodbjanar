@@ -7,6 +7,31 @@ let players = {};
 let gameState = 'LOBBY';
 let totalArtworks = 0;
 
+// Audio context for sound effects
+let audioContext = null;
+
+// Helper: Play countdown beep
+function playBeep(frequency = 800, duration = 100) {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.frequency.value = frequency;
+  oscillator.type = 'sine';
+
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration / 1000);
+}
+
 // DOM Elements
 const screens = {
   lobby: document.getElementById('lobby-screen'),
@@ -90,10 +115,11 @@ function setupSocketListeners() {
   // Artwork submitted
   socket.on('artwork_submitted', (data) => {
     document.getElementById('submissionCount').textContent = data.totalSubmitted;
+    document.getElementById('totalPlayers').textContent = data.totalExpected;
     totalArtworks = data.totalSubmitted;
 
-    // Enable auction button when all players submitted
-    if (data.totalSubmitted >= data.totalPlayers && data.totalPlayers > 0) {
+    // Enable auction button when all artworks submitted
+    if (data.totalSubmitted >= data.totalExpected && data.totalExpected > 0) {
       document.getElementById('startAuctionBtn').disabled = false;
     }
   });
@@ -125,6 +151,28 @@ function setupSocketListeners() {
   // Timer update
   socket.on('timer_update', (data) => {
     document.getElementById('timeLeft').textContent = data.timeLeft;
+
+    // Display announcement if present
+    const announcementEl = document.getElementById('announcement');
+    if (data.announcement) {
+      announcementEl.textContent = data.announcement;
+
+      // Play different sounds for different announcements
+      if (data.announcement === 'Going once...') {
+        playBeep(600, 150);
+      } else if (data.announcement === 'Going twice...') {
+        playBeep(700, 150);
+      } else if (data.announcement === 'SOLD!') {
+        playBeep(1000, 300);
+      }
+    } else {
+      announcementEl.textContent = '';
+
+      // Play tick sound for last 10 seconds
+      if (data.timeLeft <= 10 && data.timeLeft > 0) {
+        playBeep(400, 50);
+      }
+    }
   });
 
   // Round result

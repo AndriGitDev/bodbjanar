@@ -1,16 +1,16 @@
-# 🎨 Art Auction - Multiplayer Game
+# 🎨 Boðbjánar - Multiplayer Art Auction Game
 
 A Jackbox-style multiplayer web game where players create art and bid on each other's creations in a real-time auction.
 
 ## 🎮 Game Overview
 
-**Art Auction** is a local multiplayer party game built with Node.js and Socket.io. One player hosts the game on a laptop/TV (the "Host Display"), while other players join using their mobile devices as controllers.
+**Boðbjánar** is a local multiplayer party game built with Node.js and Socket.io. One player hosts the game on a laptop/TV (the "Host Display"), while other players join using their mobile devices as controllers.
 
 ### Game Flow
 
 1. **Lobby** - Players join using a 4-letter room code
-2. **Drawing Phase** - All players create artwork on a digital canvas
-3. **Auction Phase** - Players bid on artworks with limited cash
+2. **Drawing Phase** - Each player receives 2 random prompts and creates 2 artworks
+3. **Auction Phase** - Players bid on artworks. Non-artists see hints like "A cat riding a skateboard is worth $3500" and must guess if the artwork matches
 4. **Scoring** - Winner is determined by net worth (remaining cash + portfolio value)
 
 ## 🚀 Quick Start
@@ -60,7 +60,7 @@ The server will start on `http://localhost:3000`
 ### Project Structure
 
 ```
-art-auction-game/
+bodbjanar/
 ├── server.js              # Node.js server with Socket.io logic
 ├── package.json           # Dependencies
 ├── public/
@@ -80,11 +80,15 @@ art-auction-game/
 
 - ✅ Room creation with 4-letter codes
 - ✅ Real-time player join/leave
-- ✅ Touch-enabled drawing canvas
+- ✅ Touch-enabled drawing canvas with 8 colors
 - ✅ Color picker and brush size controls
+- ✅ **25 unique drawing prompts** randomly assigned to players
+- ✅ **2 artworks per player** for extended gameplay
 - ✅ Automatic artwork valuation system
-- ✅ Market hint system (Masterpiece, Good, Average, Trash)
+- ✅ **Deduction-based hint system** - non-artists see "Prompt is worth $X"
 - ✅ Real-time bidding with anti-snipe timer reset
+- ✅ **Countdown announcements**: "Going once... Going twice... SOLD!"
+- ✅ **Sound effects** for countdown and auction events
 - ✅ Cash management and inventory tracking
 - ✅ Portfolio value calculation
 - ✅ Leaderboard with rankings
@@ -92,9 +96,12 @@ art-auction-game/
 ### Game Mechanics
 
 - Starting cash: $1000 per player
+- Artworks per player: 2 (from random prompts)
 - Artwork values: $100 - $10,000 (randomly generated)
 - Bid increments: +$100 or +$500
 - Auction timer: 15 seconds (resets to 10s on new bid)
+- Hint system: Non-artists see the prompt + value, must guess if artwork matches
+- Announcements: "Going once..." (5s), "Going twice..." (3s), "SOLD!" (1s)
 - Winners determined by: Cash + Portfolio Value
 
 ## 🔧 Development
