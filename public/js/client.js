@@ -5,6 +5,9 @@ const socket = io();
 let currentState = 'join';
 let playerInfo = null;
 let currentRoomCode = null;
+let playerPrompts = [];
+let currentPromptIndex = 0;
+let submittedCount = 0;
 
 // Canvas variables
 let canvas, ctx;
@@ -201,13 +204,53 @@ function setupSocketListeners() {
   // Phase change
   socket.on('phase_change', (data) => {
     if (data.phase === 'DRAWING') {
-      switchScreen('drawing');
+      // Phase change happens, but we wait for prompts before showing screen
     }
+  });
+
+  // Receive prompts
+  socket.on('receive_prompts', (data) => {
+    playerPrompts = data.prompts;
+    currentPromptIndex = 0;
+    submittedCount = 0;
+
+    // Clear canvas
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Update prompt display
+    updatePromptDisplay();
+
+    // Show drawing screen
+    switchScreen('drawing');
+
+    // Re-enable submit button
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = 'Submit Art';
   });
 
   // Submit success
   socket.on('submit_success', (data) => {
-    switchScreen('waitingAuction');
+    submittedCount = data.submittedCount;
+
+    if (submittedCount < 2) {
+      // More artworks to draw
+      currentPromptIndex = submittedCount;
+
+      // Clear canvas for next drawing
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Update prompt display
+      updatePromptDisplay();
+
+      // Re-enable submit button
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = 'Submit Art';
+    } else {
+      // All artworks submitted
+      switchScreen('waitingAuction');
+    }
   });
 
   // Auction round start
@@ -216,15 +259,20 @@ function setupSocketListeners() {
 
     document.getElementById('biddingArtwork').src = artwork.imageData;
     document.getElementById('biddingArtist').textContent = artwork.artistName;
-    document.getElementById('artworkHint').textContent = artwork.hint;
     document.getElementById('playerCash').textContent = `$${data.yourCash}`;
 
-    // Show badge if it's your art
+    // Show badge and hint based on whether it's your art
     const yourArtBadge = document.getElementById('yourArtBadge');
+    const hintBox = document.querySelector('.hint-box');
+    const hintText = document.getElementById('artworkHint');
+
     if (artwork.isYourArt) {
       yourArtBadge.classList.remove('hidden');
+      hintBox.classList.add('hidden'); // Hide hint for artist
     } else {
       yourArtBadge.classList.add('hidden');
+      hintBox.classList.remove('hidden');
+      hintText.textContent = artwork.hint;
     }
 
     // Reset bid display
@@ -332,6 +380,20 @@ function switchScreen(screenName) {
   Object.values(screens).forEach(screen => screen.classList.add('hidden'));
   screens[screenName].classList.remove('hidden');
   currentState = screenName;
+}
+
+// Helper: Update prompt display
+function updatePromptDisplay() {
+  const promptElement = document.getElementById('currentPrompt');
+  const progressElement = document.getElementById('promptProgress');
+
+  if (promptElement && playerPrompts.length > 0) {
+    promptElement.textContent = playerPrompts[currentPromptIndex];
+  }
+
+  if (progressElement) {
+    progressElement.textContent = `Artwork ${currentPromptIndex + 1} of 2`;
+  }
 }
 
 // Helper: Show message

@@ -20,6 +20,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 // In-memory storage for rooms
 const rooms = {};
 
+// Drawing prompts
+const DRAWING_PROMPTS = [
+  "A cat riding a skateboard",
+  "Chilling on a beach",
+  "A superhero saving the day",
+  "A delicious pizza",
+  "A haunted house",
+  "A rocket ship to Mars",
+  "A magical forest",
+  "A monster under the bed",
+  "A fancy dinner party",
+  "A snowman in summer",
+  "A dragon hoarding treasure",
+  "A robot doing yoga",
+  "A pirate ship battle",
+  "A unicorn at a rave",
+  "An alien's first day on Earth",
+  "A bear fishing",
+  "A time machine",
+  "A dance party",
+  "A castle in the clouds",
+  "A ninja doing laundry",
+  "A mermaid's coffee shop",
+  "A vampire at the dentist",
+  "A wizard's potion lab",
+  "An octopus playing drums",
+  "A penguin's birthday party"
+];
+
+// Helper function to get random prompt
+function getRandomPrompt(usedPrompts = []) {
+  const availablePrompts = DRAWING_PROMPTS.filter(p => !usedPrompts.includes(p));
+  if (availablePrompts.length === 0) return DRAWING_PROMPTS[0]; // Fallback
+  return availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+}
+
 // Helper function to generate 4-letter room code
 function generateRoomCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -146,11 +182,28 @@ io.on('connection', (socket) => {
     rooms[roomCode].gameState = 'DRAWING';
     rooms[roomCode].artworks = []; // Reset artworks
 
+    // Assign 2 prompts to each player
+    const usedPrompts = [];
+    Object.keys(rooms[roomCode].players).forEach(playerId => {
+      const prompt1 = getRandomPrompt(usedPrompts);
+      usedPrompts.push(prompt1);
+      const prompt2 = getRandomPrompt(usedPrompts);
+      usedPrompts.push(prompt2);
+
+      rooms[roomCode].players[playerId].prompts = [prompt1, prompt2];
+      rooms[roomCode].players[playerId].submittedCount = 0;
+
+      // Send prompts to the player
+      io.to(playerId).emit('receive_prompts', {
+        prompts: [prompt1, prompt2]
+      });
+    });
+
     console.log(`Drawing phase started in room ${roomCode}`);
 
     io.to(roomCode).emit('phase_change', {
       phase: 'DRAWING',
-      message: 'Time to create your masterpiece!'
+      message: 'Time to create your masterpieces!'
     });
   });
 
@@ -168,15 +221,17 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Check if player already submitted
-    const existingArt = rooms[roomCode].artworks.find(art => art.artistSocketId === socket.id);
-    if (existingArt) {
-      socket.emit('error', { message: 'Already submitted artwork' });
+    const player = rooms[roomCode].players[socket.id];
+
+    // Check if player already submitted 2 artworks
+    if (player.submittedCount >= 2) {
+      socket.emit('error', { message: 'Already submitted all artworks' });
       return;
     }
 
+    // Get the current prompt for this submission
+    const prompt = player.prompts[player.submittedCount];
     const trueValue = generateTrueValue();
-    const hint = generateHint(trueValue);
 
     const artwork = {
       id: `art_${Date.now()}_${socket.id}`,
@@ -184,24 +239,28 @@ io.on('connection', (socket) => {
       artistName: socket.playerName,
       imageData: imageData,
       trueValue: trueValue,
-      hint: hint,
+      prompt: prompt, // The actual drawing prompt
       soldTo: null,
       soldPrice: 0
     };
 
     rooms[roomCode].artworks.push(artwork);
+    player.submittedCount++;
 
-    console.log(`Artwork submitted by ${socket.playerName} in room ${roomCode}`);
+    console.log(`Artwork ${player.submittedCount}/2 submitted by ${socket.playerName} in room ${roomCode} (${prompt})`);
 
     socket.emit('submit_success', {
-      message: 'Artwork submitted successfully!'
+      message: `Artwork ${player.submittedCount}/2 submitted!`,
+      submittedCount: player.submittedCount,
+      totalRequired: 2
     });
 
     // Notify host about submission
+    const totalExpected = Object.keys(rooms[roomCode].players).length * 2;
     io.to(rooms[roomCode].hostSocketId).emit('artwork_submitted', {
       artistName: socket.playerName,
       totalSubmitted: rooms[roomCode].artworks.length,
-      totalPlayers: Object.keys(rooms[roomCode].players).length
+      totalExpected: totalExpected
     });
   });
 
@@ -349,15 +408,22 @@ function startAuctionRound(roomCode) {
     totalRounds: room.artworks.length
   });
 
-  // Send artwork to all players (with hint but not true value)
+  // Send artwork to all players
   Object.keys(room.players).forEach(playerId => {
     const isArtist = playerId === currentArt.artistSocketId;
+
+    // Generate hint: for non-artists, show the prompt + value
+    let hint = null;
+    if (!isArtist) {
+      hint = `${currentArt.prompt} is worth $${currentArt.trueValue}`;
+    }
+
     io.to(playerId).emit('start_auction_round', {
       artwork: {
         id: currentArt.id,
         artistName: currentArt.artistName,
         imageData: currentArt.imageData,
-        hint: currentArt.hint,
+        hint: hint, // Only shown to non-artists
         isYourArt: isArtist
       },
       roundNumber: room.auctionState.currentArtIndex + 1,
@@ -383,13 +449,24 @@ function startAuctionTimer(roomCode) {
 
     room.auctionState.timer--;
 
+    // Countdown announcements
+    let announcement = null;
+    if (room.auctionState.timer === 5) {
+      announcement = 'Going once...';
+    } else if (room.auctionState.timer === 3) {
+      announcement = 'Going twice...';
+    } else if (room.auctionState.timer === 1) {
+      announcement = 'SOLD!';
+    }
+
     if (room.auctionState.timer <= 0) {
       clearInterval(timerInterval);
       endAuctionRound(roomCode);
     } else {
-      // Broadcast timer update
+      // Broadcast timer update with announcement
       io.to(roomCode).emit('timer_update', {
-        timeLeft: room.auctionState.timer
+        timeLeft: room.auctionState.timer,
+        announcement: announcement
       });
     }
   }, 1000);
@@ -480,7 +557,7 @@ function endAuction(roomCode) {
 
 // Start server
 server.listen(PORT, () => {
-  console.log(`Art Auction server running on port ${PORT}`);
+  console.log(`Boðbjánar server running on port ${PORT}`);
   console.log(`Visit http://localhost:${PORT}/host.html to host a game`);
   console.log(`Visit http://localhost:${PORT} to join as a player`);
 });
