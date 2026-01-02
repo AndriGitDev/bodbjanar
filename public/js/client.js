@@ -123,6 +123,12 @@ function setupDrawingCanvas() {
       lastX = (e.clientX - rect.left) * scaleX;
       lastY = (e.clientY - rect.top) * scaleY;
     }
+
+    // Draw a dot at the tap location (for taps without dragging)
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, brushSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = currentColor;
+    ctx.fill();
   }
 
   function draw(e) {
