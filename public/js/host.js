@@ -187,13 +187,13 @@ function setupSocketListeners() {
 
     if (profit > 0) {
       profitElement.textContent = `+$${profit}`;
-      profitElement.style.color = '#4CAF50';
+      profitElement.style.color = 'var(--success-green)';
     } else if (profit < 0) {
       profitElement.textContent = `-$${Math.abs(profit)}`;
-      profitElement.style.color = '#f44336';
+      profitElement.style.color = 'var(--alert-red)';
     } else {
       profitElement.textContent = `$0`;
-      profitElement.style.color = '#ffd700';
+      profitElement.style.color = 'var(--auction-gold)';
     }
 
     switchScreen('result');
@@ -227,6 +227,7 @@ function updatePlayersDisplay() {
     playersGrid.innerHTML = `
       <div class="player-card" style="opacity: 0.5;">
         <h4>Waiting for players...</h4>
+        <p class="lot-number">LOT #000</p>
       </div>
     `;
     return;
@@ -234,13 +235,15 @@ function updatePlayersDisplay() {
 
   playersGrid.innerHTML = '';
 
-  Object.values(players).forEach(player => {
+  Object.values(players).forEach((player, index) => {
     const card = document.createElement('div');
     card.className = 'player-card';
+    const lotNumber = String(index + 1).padStart(3, '0');
     card.innerHTML = `
-      <img src="${player.avatar}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;">
+      <img src="${player.avatar}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: var(--space-sm); border: 2px solid var(--auction-gold);">
       <h4>${player.name}</h4>
-      <p style="margin: 5px 0; color: #4CAF50; font-weight: bold;">$${player.cash}</p>
+      <p class="lot-number">LOT #${lotNumber}</p>
+      <p style="margin-top: var(--space-xs); color: var(--success-green); font-family: var(--font-accent); font-weight: 600;">$${player.cash}</p>
     `;
     playersGrid.appendChild(card);
   });
@@ -255,19 +258,22 @@ function displayLeaderboard(results) {
     const item = document.createElement('div');
     item.className = 'leaderboard-item' + (index === 0 ? ' first' : '');
 
-    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+    // Use Roman numerals for top 3, numbers for rest
+    const rankDisplay = index === 0 ? 'I' : index === 1 ? 'II' : index === 2 ? 'III' : index + 1;
 
     item.innerHTML = `
-      <div class="rank">${medal}</div>
+      <div class="rank">${rankDisplay}</div>
       <div class="player-info">
         <h3>${result.name}</h3>
-        <p style="margin: 5px 0;">
-          Cash: $${result.cash} | Portfolio: $${result.portfolioValue} | Artworks: ${result.artworkCount}
+        <p style="margin: var(--space-xs) 0; color: var(--warm-gray); font-size: 0.875rem; letter-spacing: 0.03em;">
+          Cash: <span style="color: var(--warm-white);">$${result.cash}</span> |
+          Portfolio: <span style="color: var(--warm-white);">$${result.portfolioValue}</span> |
+          Artworks: <span style="color: var(--warm-white);">${result.artworkCount}</span>
         </p>
       </div>
       <div class="score-info">
         <div class="net-worth">$${result.netWorth}</div>
-        <div>Net Worth</div>
+        <div style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-gray); margin-top: var(--space-xs);">Net Worth</div>
       </div>
     `;
 

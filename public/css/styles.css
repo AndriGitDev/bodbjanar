@@ -1,21 +1,1116 @@
 /*
- * Art Auction - Shared Styles
- * Mobile-first responsive design
+ * BOÐBJÁNAR - Elegant Auction House Design System
+ * A sophisticated, timeless design inspired by high-end auction houses
  */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES
+   ========================================================================= */
+
+:root {
+  /* Primary Color Palette */
+  --auction-black: #1a1a1a;
+  --auction-charcoal: #2d2d2d;
+  --auction-cream: #f5f1e8;
+  --auction-ivory: #fdfbf7;
+  --auction-gold: #d4af37;
+  --auction-gold-light: #e8c968;
+  --auction-gold-dark: #b8962e;
+  --auction-burgundy: #6d1f1f;
+  --auction-deep-green: #1e3a2e;
+
+  /* Accent Colors */
+  --success-green: #2d5f3f;
+  --alert-red: #8b2635;
+  --info-blue: #2c4f6f;
+
+  /* Neutral Shades */
+  --warm-white: #fdfbf7;
+  --warm-gray: #8a8a8a;
+  --border-gold: rgba(212, 175, 55, 0.2);
+  --border-gold-solid: rgba(212, 175, 55, 0.4);
+
+  /* Shadow System */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.2);
+  --shadow-artwork: 0 16px 48px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(212, 175, 55, 0.1);
+  --shadow-gold-glow: 0 0 20px rgba(212, 175, 55, 0.3);
+
+  /* Spacing Scale (8px base) */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 40px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Typography Scale */
+  --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-accent: 'Bodoni Moda', 'Libre Baskerville', serif;
+
+  /* Border Radius */
+  --radius-minimal: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  /* Transitions */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  --transition-entrance: 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* ============================================================================
+   GLOBAL RESET & BASE STYLES
+   ========================================================================= */
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
 }
 
-/* Utility classes */
+/* ============================================================================
+   TYPOGRAPHY SYSTEM
+   ========================================================================= */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.display {
+  font-family: var(--font-accent);
+  font-size: clamp(3rem, 8vw, 6rem);
+  letter-spacing: 0.2em;
+  font-weight: 400;
+}
+
+.headline {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: var(--space-md);
+}
+
+.subheadline {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  margin-bottom: var(--space-sm);
+}
+
+.body-large {
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.small-caps {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.serif-accent {
+  font-family: var(--font-accent);
+}
+
+/* Price and number styling */
+.price, .number-display {
+  font-family: var(--font-accent);
+  font-variant-numeric: tabular-nums;
+  color: var(--auction-gold);
+  font-weight: 600;
+}
+
+/* ============================================================================
+   HOST DISPLAY STYLES
+   ========================================================================= */
+
+.host-body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--auction-charcoal);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.01) 2px,
+      rgba(255, 255, 255, 0.01) 4px
+    );
+  color: var(--warm-white);
+  min-height: 100vh;
+}
+
+.host-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-2xl);
+}
+
+/* Header / Logo */
+.host-header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.host-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  letter-spacing: 0.15em;
+  color: var(--auction-gold);
+  text-shadow: 0 2px 12px rgba(212, 175, 55, 0.4);
+  margin: 0;
+  font-weight: 400;
+  position: relative;
+  display: inline-block;
+}
+
+.host-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--auction-gold), transparent);
+}
+
+/* Room Code Display */
+.room-code-display {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-gold);
+  padding: var(--space-2xl) var(--space-xl);
+  border-radius: var(--radius-minimal);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+}
+
+.room-code-display h2 {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--warm-gray);
+  margin-bottom: var(--space-md);
+  font-weight: 600;
+}
+
+.room-code {
+  font-family: var(--font-accent);
+  font-size: clamp(3rem, 10vw, 5rem);
+  letter-spacing: 0.3em;
+  color: var(--auction-gold);
+  text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+  font-weight: 400;
+  margin: var(--space-sm) 0;
+}
+
+.join-url {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--warm-gray);
+  margin-top: var(--space-md);
+  letter-spacing: 0.05em;
+}
+
+.join-url strong {
+  color: var(--warm-white);
+  font-weight: 500;
+}
+
+/* Game State Banner */
+.game-state {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-gold);
+  padding: var(--space-lg);
+  border-radius: var(--radius-minimal);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  backdrop-filter: blur(20px);
+}
+
+.game-state h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: var(--auction-gold);
+  margin-bottom: var(--space-sm);
+  letter-spacing: 0.05em;
+}
+
+.game-state p {
+  font-size: 1.125rem;
+  color: var(--warm-gray);
+  letter-spacing: 0.03em;
+}
+
+/* Players Section */
+.players-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-gold);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-2xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+}
+
+.players-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  margin-bottom: var(--space-lg);
+  color: var(--warm-white);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.player-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-gold-solid);
+  padding: var(--space-lg);
+  border-radius: var(--radius-minimal);
+  text-align: center;
+  transition: var(--transition-smooth);
+  position: relative;
+}
+
+.player-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--radius-minimal);
+  padding: 1px;
+  background: linear-gradient(135deg, var(--auction-gold) 0%, transparent 50%, var(--auction-gold) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: var(--transition-smooth);
+}
+
+.player-card:hover::before {
+  opacity: 0.3;
+}
+
+.player-card h4 {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  margin-bottom: var(--space-xs);
+  color: var(--warm-white);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.player-card .lot-number {
+  font-family: var(--font-accent);
+  font-size: 0.875rem;
+  color: var(--auction-gold);
+  letter-spacing: 0.1em;
+}
+
+/* Auction Section */
+.auction-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-gold);
+  padding: var(--space-3xl);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-2xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+}
+
+.artwork-display {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.artist-label {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--warm-gray);
+  margin-bottom: var(--space-md);
+}
+
+.artist-label strong {
+  color: var(--warm-white);
+  font-weight: 600;
+}
+
+/* Ornate Artwork Frame */
+.artwork-frame {
+  display: inline-block;
+  position: relative;
+  padding: 16px;
+  background: var(--warm-white);
+  border-radius: var(--radius-minimal);
+  box-shadow: var(--shadow-artwork);
+}
+
+.artwork-frame::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2px double var(--auction-gold);
+  border-radius: var(--radius-minimal);
+  pointer-events: none;
+}
+
+.artwork-image {
+  display: block;
+  max-width: 700px;
+  max-height: 500px;
+  width: auto;
+  height: auto;
+  background: white;
+  border-radius: var(--radius-minimal);
+}
+
+/* Auction Info Grid */
+.auction-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+.info-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-gold-solid);
+  padding: var(--space-lg);
+  border-radius: var(--radius-minimal);
+  text-align: center;
+  transition: var(--transition-smooth);
+}
+
+.info-box h4 {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--warm-gray);
+  margin-bottom: var(--space-sm);
+  font-weight: 600;
+}
+
+.info-box .value {
+  font-family: var(--font-accent);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  color: var(--auction-gold);
+  line-height: 1;
+}
+
+.info-box .value.small-text {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+/* Auction Announcements */
+.announcement {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 600;
+  margin-top: var(--space-2xl);
+  min-height: 80px;
+  color: var(--auction-gold);
+  text-shadow: 0 2px 20px rgba(212, 175, 55, 0.5);
+  letter-spacing: 0.05em;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Leaderboard */
+.leaderboard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-gold);
+  padding: var(--space-3xl);
+  border-radius: var(--radius-minimal);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+}
+
+.leaderboard h2 {
+  font-family: var(--font-display);
+  text-align: center;
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  margin-bottom: var(--space-2xl);
+  color: var(--auction-gold);
+  letter-spacing: 0.05em;
+}
+
+.leaderboard-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-gold-solid);
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition-smooth);
+}
+
+.leaderboard-item.first {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(232, 201, 104, 0.15) 100%);
+  border: 2px solid var(--auction-gold);
+  box-shadow: var(--shadow-gold-glow);
+  transform: scale(1.02);
+}
+
+.leaderboard-item .rank {
+  font-family: var(--font-accent);
+  font-size: 2.5rem;
+  font-weight: 400;
+  width: 80px;
+  color: var(--auction-gold);
+  text-align: center;
+}
+
+.leaderboard-item.first .rank {
+  font-size: 3rem;
+}
+
+.leaderboard-item .player-info {
+  flex: 1;
+  margin-left: var(--space-lg);
+}
+
+.leaderboard-item .player-info h3 {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--warm-white);
+  margin-bottom: var(--space-xs);
+}
+
+.leaderboard-item .score-info {
+  text-align: right;
+}
+
+.leaderboard-item .net-worth {
+  font-family: var(--font-accent);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--auction-gold);
+}
+
+/* Round Result */
+.round-result {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-gold);
+  padding: var(--space-3xl);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-2xl);
+  backdrop-filter: blur(20px);
+  text-align: center;
+}
+
+.round-result h2 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  margin-bottom: var(--space-2xl);
+  color: var(--warm-white);
+}
+
+.result-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+.result-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-gold-solid);
+  padding: var(--space-xl);
+  border-radius: var(--radius-minimal);
+}
+
+.result-box h3 {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-md);
+  color: var(--warm-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.result-box .highlight {
+  font-family: var(--font-accent);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--auction-gold);
+}
+
+/* ============================================================================
+   PLAYER DISPLAY STYLES
+   ========================================================================= */
+
+.player-body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--auction-ivory);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.01) 2px,
+      rgba(0, 0, 0, 0.01) 4px
+    );
+  color: var(--auction-black);
+  min-height: 100vh;
+  touch-action: manipulation;
+}
+
+.player-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Player Header */
+.player-header {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.player-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3rem);
+  letter-spacing: 0.1em;
+  color: var(--auction-charcoal);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Card Component */
+.card {
+  background: white;
+  border: 1px solid var(--border-gold);
+  padding: var(--space-xl);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.card h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  color: var(--auction-charcoal);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* Form Elements */
+.input-group {
+  margin-bottom: var(--space-lg);
+}
+
+.input-group label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--auction-charcoal);
+  margin-bottom: var(--space-xs);
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  padding: var(--space-md);
+  font-size: 1.125rem;
+  font-family: var(--font-body);
+  border: none;
+  border-bottom: 2px solid var(--border-gold-solid);
+  background: transparent;
+  color: var(--auction-black);
+  transition: var(--transition-smooth);
+  border-radius: 0;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-bottom-color: var(--auction-gold);
+  background: rgba(212, 175, 55, 0.03);
+}
+
+.input-group input::placeholder {
+  color: var(--warm-gray);
+  opacity: 0.6;
+}
+
+/* Canvas Styling */
+.canvas-container {
+  position: relative;
+  margin-bottom: var(--space-lg);
+}
+
+#drawingCanvas {
+  width: 100%;
+  height: 400px;
+  background: white;
+  border-radius: var(--radius-minimal);
+  touch-action: none;
+  cursor: crosshair;
+  box-shadow: var(--shadow-artwork);
+  border: 8px solid var(--auction-cream);
+  outline: 2px solid var(--auction-gold);
+  outline-offset: -12px;
+}
+
+/* Color Picker */
+.color-picker {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.color-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.color-btn::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--auction-gold);
+  opacity: 0;
+  transition: var(--transition-smooth);
+}
+
+.color-btn.active::before {
+  opacity: 1;
+}
+
+.color-btn:active {
+  transform: scale(0.95);
+}
+
+/* Brush Size Control */
+.brush-size {
+  margin-bottom: var(--space-lg);
+}
+
+.brush-size label {
+  display: block;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs);
+  color: var(--auction-charcoal);
+  font-weight: 600;
+}
+
+.brush-size input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--auction-cream);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.brush-size input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--auction-gold);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.brush-size input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--auction-gold);
+  cursor: pointer;
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Hint Box */
+.hint-box {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(232, 201, 104, 0.05) 100%);
+  border: 1px solid var(--border-gold-solid);
+  padding: var(--space-lg);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-lg);
+}
+
+.hint-box h4 {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--auction-charcoal);
+  margin-bottom: var(--space-xs);
+  font-weight: 600;
+}
+
+.hint-box p {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--auction-black);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Player Status */
+.player-status {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--border-gold-solid);
+  padding: var(--space-lg);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.player-status h3 {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-sm);
+  color: var(--auction-charcoal);
+}
+
+.cash-display {
+  font-family: var(--font-accent);
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--success-green);
+}
+
+/* Artwork Preview */
+.artwork-preview {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.artwork-preview img {
+  max-width: 100%;
+  max-height: 350px;
+  border: 8px solid var(--auction-cream);
+  outline: 2px solid var(--auction-gold);
+  outline-offset: -12px;
+  border-radius: var(--radius-minimal);
+  background: white;
+  box-shadow: var(--shadow-artwork);
+}
+
+.artwork-preview p {
+  margin-top: var(--space-md);
+  font-size: 1rem;
+  color: var(--auction-charcoal);
+}
+
+/* Your Art Badge */
+.your-art-badge {
+  background: linear-gradient(135deg, var(--auction-gold) 0%, var(--auction-gold-light) 100%);
+  color: var(--auction-charcoal);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 20px;
+  font-weight: 600;
+  display: inline-block;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-gold-glow);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+/* Auction Info (Player) */
+.auction-info {
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid var(--border-gold-solid);
+  padding: var(--space-lg);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-md);
+}
+
+.auction-info p {
+  margin: var(--space-xs) 0;
+  font-size: 1rem;
+  color: var(--auction-charcoal);
+}
+
+.auction-info strong {
+  font-weight: 600;
+}
+
+/* Messages */
+.message {
+  padding: var(--space-lg);
+  border-radius: var(--radius-minimal);
+  margin-bottom: var(--space-md);
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.message.success {
+  background: rgba(45, 95, 63, 0.1);
+  border: 1px solid var(--success-green);
+  color: var(--success-green);
+}
+
+.message.error {
+  background: rgba(139, 38, 53, 0.1);
+  border: 1px solid var(--alert-red);
+  color: var(--alert-red);
+}
+
+.message.info {
+  background: rgba(44, 79, 111, 0.1);
+  border: 1px solid var(--info-blue);
+  color: var(--info-blue);
+}
+
+/* Waiting State */
+.waiting-message {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.waiting-message p {
+  font-size: 1.125rem;
+  color: var(--auction-charcoal);
+  margin-top: var(--space-md);
+}
+
+.spinner {
+  border: 4px solid rgba(212, 175, 55, 0.2);
+  border-top: 4px solid var(--auction-gold);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+/* ============================================================================
+   BUTTON SYSTEM
+   ========================================================================= */
+
+.btn {
+  padding: var(--space-md) var(--space-2xl);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: none;
+  border-radius: var(--radius-minimal);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Primary Button (Gold) */
+.btn-primary {
+  background: linear-gradient(135deg, var(--auction-gold) 0%, var(--auction-gold-light) 100%);
+  color: var(--auction-charcoal);
+  border: 2px solid transparent;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--auction-gold-light) 0%, var(--auction-gold) 100%);
+  box-shadow: var(--shadow-gold-glow);
+}
+
+/* Secondary Button (Outlined) */
+.btn-secondary {
+  background: transparent;
+  color: var(--auction-charcoal);
+  border: 2px solid var(--auction-charcoal);
+}
+
+.btn-secondary:hover {
+  background: var(--auction-charcoal);
+  color: var(--warm-white);
+}
+
+/* Host display secondary button (for dark backgrounds) */
+.host-body .btn-secondary {
+  color: var(--warm-white);
+  border: 2px solid var(--auction-gold);
+}
+
+.host-body .btn-secondary:hover {
+  background: var(--auction-gold);
+  color: var(--auction-charcoal);
+}
+
+/* Danger Button */
+.btn-danger {
+  background: var(--alert-red);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #a02f42;
+}
+
+/* Control Buttons Layout */
+.control-buttons {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  margin-top: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+/* Bid Buttons */
+.bid-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+/* Canvas Controls */
+.canvas-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ========================================================================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ========================================================================= */
+
 .hidden {
   display: none !important;
 }
@@ -28,23 +1123,32 @@ body {
   font-weight: bold;
 }
 
-/* Responsive adjustments */
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ========================================================================= */
+
 @media (max-width: 768px) {
-  .host-container {
-    padding: 10px;
+  :root {
+    --space-xl: 24px;
+    --space-2xl: 32px;
+    --space-3xl: 40px;
   }
 
-  .header h1 {
-    font-size: 2rem !important;
+  .host-container {
+    padding: var(--space-lg);
   }
 
   .room-code {
-    font-size: 3rem !important;
-    letter-spacing: 5px !important;
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    letter-spacing: 0.2em;
   }
 
   .auction-info {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
+  }
+
+  .result-details {
+    grid-template-columns: 1fr;
   }
 
   .leaderboard-item {
@@ -52,29 +1156,43 @@ body {
     text-align: center;
   }
 
-  .score-info {
-    text-align: center !important;
-    margin-top: 10px;
+  .leaderboard-item .player-info {
+    margin-left: 0;
+    margin-top: var(--space-sm);
+  }
+
+  .leaderboard-item .score-info {
+    text-align: center;
+    margin-top: var(--space-sm);
+  }
+
+  .control-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
   }
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+@media (max-width: 480px) {
+  .players-grid {
+    grid-template-columns: 1fr;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .card {
+    padding: var(--space-lg);
+  }
+
+  #drawingCanvas {
+    height: 300px;
   }
 }
 
-.card {
-  animation: fadeIn 0.3s ease-out;
-}
+/* ============================================================================
+   PRINT STYLES
+   ========================================================================= */
 
-/* Print styles */
 @media print {
   body {
     background: white;
