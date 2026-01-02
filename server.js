@@ -455,19 +455,19 @@ function startAuctionTimer(roomCode) {
       announcement = 'Going once...';
     } else if (room.auctionState.timer === 3) {
       announcement = 'Going twice...';
-    } else if (room.auctionState.timer === 1) {
+    } else if (room.auctionState.timer === 0) {
       announcement = 'SOLD!';
     }
+
+    // Always broadcast timer update with announcement
+    io.to(roomCode).emit('timer_update', {
+      timeLeft: room.auctionState.timer,
+      announcement: announcement
+    });
 
     if (room.auctionState.timer <= 0) {
       clearInterval(timerInterval);
       endAuctionRound(roomCode);
-    } else {
-      // Broadcast timer update with announcement
-      io.to(roomCode).emit('timer_update', {
-        timeLeft: room.auctionState.timer,
-        announcement: announcement
-      });
     }
   }, 1000);
 }
