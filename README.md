@@ -95,7 +95,7 @@ bodbjanar/
 
 ### Game Mechanics
 
-- Starting cash: $1000 per player
+- Starting cash: $5000 per player
 - Artworks per player: 2 (from random prompts)
 - Artwork values: $100 - $10,000 (randomly generated)
 - Bid increments: +$100 or +$500
