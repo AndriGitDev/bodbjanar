@@ -138,7 +138,7 @@ io.on('connection', (socket) => {
     rooms[roomCode].players[socket.id] = {
       socketId: socket.id,
       name: name,
-      cash: 1000,
+      cash: 5000,
       inventory: [],
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${socket.id}`
     };
