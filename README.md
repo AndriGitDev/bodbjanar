@@ -32,6 +32,13 @@ npm start
 
 The server will start on `http://localhost:3000`
 
+### Environment Variables
+
+You can configure the server using environment variables or a `.env` file:
+
+- `PORT`: The port the server listens on (default: `3000`)
+- `CORS_ORIGIN`: Allowed origins for Socket.io (default: `*`)
+
 ### How to Play
 
 1. **Host**: Open `http://localhost:3000/host.html` on a laptop/TV
@@ -92,6 +99,7 @@ bodbjanar/
 - ✅ Cash management and inventory tracking
 - ✅ Portfolio value calculation
 - ✅ Leaderboard with rankings
+- ✅ **Security Features**: Input sanitization, rate limiting, and size limits for drawing data
 
 ### Game Mechanics
 

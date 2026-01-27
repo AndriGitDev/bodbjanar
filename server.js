@@ -1,3 +1,10 @@
+/**
+ * Boðbjánar - Multiplayer Art Auction Game Server
+ *
+ * This server handles room creation, player management, drawing phases,
+ * and real-time auction logic using Socket.io.
+ */
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -7,12 +14,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: process.env.CORS_ORIGIN || "*",
     methods: ["GET", "POST"]
   }
 });
 
 const PORT = process.env.PORT || 3000;
+const MAX_IMAGE_SIZE = 200 * 1024; // 200KB
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -20,7 +28,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // In-memory storage for rooms
 const rooms = {};
 
-// Drawing prompts
+/**
+ * List of drawing prompts randomly assigned to players.
+ * @type {string[]}
+ */
 const DRAWING_PROMPTS = [
   "A cat riding a skateboard",
   "Chilling on a beach",
@@ -49,14 +60,21 @@ const DRAWING_PROMPTS = [
   "A penguin's birthday party"
 ];
 
-// Helper function to get random prompt
+/**
+ * Selects a random prompt that hasn't been used yet in the current room.
+ * @param {string[]} usedPrompts - List of prompts already assigned.
+ * @returns {string} A drawing prompt.
+ */
 function getRandomPrompt(usedPrompts = []) {
   const availablePrompts = DRAWING_PROMPTS.filter(p => !usedPrompts.includes(p));
   if (availablePrompts.length === 0) return DRAWING_PROMPTS[0]; // Fallback
   return availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
 }
 
-// Helper function to generate 4-letter room code
+/**
+ * Generates a unique 4-letter uppercase room code.
+ * @returns {string} The generated room code.
+ */
 function generateRoomCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let code = '';
@@ -70,12 +88,19 @@ function generateRoomCode() {
   return code;
 }
 
-// Helper function to generate true value for artwork
+/**
+ * Generates a random "true value" for an artwork between $100 and $10,000.
+ * @returns {number} The generated value.
+ */
 function generateTrueValue() {
   return Math.floor(Math.random() * 9900) + 100; // 100-10000
 }
 
-// Helper function to generate hint based on true value
+/**
+ * Generates a descriptive hint based on the artwork's true value.
+ * @param {number} trueValue - The actual value of the artwork.
+ * @returns {string} A hint string.
+ */
 function generateHint(trueValue) {
   if (trueValue > 8000) return "Masterpiece - Critics are raving!";
   if (trueValue > 6000) return "Excellent - Strong market potential";
@@ -85,9 +110,35 @@ function generateHint(trueValue) {
   return "Trash - Market rejection likely";
 }
 
+// Rate limiting map
+const messageCounts = new Map();
+const RATE_LIMIT_WINDOW = 1000; // 1 second
+const MAX_MESSAGES_PER_WINDOW = 10;
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
   console.log(`New connection: ${socket.id}`);
+
+  // Simple rate limiting middleware
+  socket.use((packet, next) => {
+    const now = Date.now();
+    const stats = messageCounts.get(socket.id) || { count: 0, lastReset: now };
+
+    if (now - stats.lastReset > RATE_LIMIT_WINDOW) {
+      stats.count = 1;
+      stats.lastReset = now;
+    } else {
+      stats.count++;
+    }
+
+    messageCounts.set(socket.id, stats);
+
+    if (stats.count > MAX_MESSAGES_PER_WINDOW) {
+      console.warn(`Rate limit exceeded for socket ${socket.id}`);
+      return next(new Error('Rate limit exceeded. Please slow down.'));
+    }
+    next();
+  });
 
   // Host creates a room
   socket.on('create_room', () => {
@@ -123,6 +174,9 @@ io.on('connection', (socket) => {
   // Player joins a room
   socket.on('join_room', ({ roomCode, name }) => {
     roomCode = roomCode.toUpperCase().trim();
+
+    // Sanitize and limit name
+    name = name ? name.toString().trim().substring(0, 15) : 'Anonymous';
 
     if (!rooms[roomCode]) {
       socket.emit('error', { message: 'Room not found' });
@@ -210,6 +264,12 @@ io.on('connection', (socket) => {
   // Player submits artwork
   socket.on('submit_drawing', ({ imageData }) => {
     const roomCode = socket.roomCode;
+
+    // Validate image data size
+    if (imageData && imageData.length > MAX_IMAGE_SIZE) {
+      socket.emit('error', { message: 'Image data too large' });
+      return;
+    }
 
     if (!roomCode || !rooms[roomCode]) {
       socket.emit('error', { message: 'Room not found' });
@@ -341,6 +401,7 @@ io.on('connection', (socket) => {
   // Disconnect handling
   socket.on('disconnect', () => {
     console.log(`Disconnected: ${socket.id}`);
+    messageCounts.delete(socket.id);
 
     const roomCode = socket.roomCode;
 
@@ -377,7 +438,10 @@ io.on('connection', (socket) => {
   });
 });
 
-// Helper function to start an auction round
+/**
+ * Initializes and starts a new auction round for the next artwork in the room.
+ * @param {string} roomCode - The room code.
+ */
 function startAuctionRound(roomCode) {
   const room = rooms[roomCode];
   if (!room) return;
@@ -436,7 +500,11 @@ function startAuctionRound(roomCode) {
   startAuctionTimer(roomCode);
 }
 
-// Auction timer
+/**
+ * Starts the countdown timer for the current auction round.
+ * Handles "Going once/twice/SOLD" announcements.
+ * @param {string} roomCode - The room code.
+ */
 function startAuctionTimer(roomCode) {
   const room = rooms[roomCode];
   if (!room || room.gameState !== 'BIDDING') return;
@@ -472,7 +540,10 @@ function startAuctionTimer(roomCode) {
   }, 1000);
 }
 
-// End current auction round
+/**
+ * Ends the current auction round, determines the winner, and updates balances.
+ * @param {string} roomCode - The room code.
+ */
 function endAuctionRound(roomCode) {
   const room = rooms[roomCode];
   if (!room) return;
@@ -523,7 +594,10 @@ function endAuctionRound(roomCode) {
   }, 5000); // 5 second delay to show results
 }
 
-// End auction and show final scores
+/**
+ * Concludes the auction phase and calculates final scores for all players.
+ * @param {string} roomCode - The room code.
+ */
 function endAuction(roomCode) {
   const room = rooms[roomCode];
   if (!room) return;

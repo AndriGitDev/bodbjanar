@@ -1,19 +1,25 @@
 {
   "name": "bodbjanar",
   "version": "1.0.0",
-  "description": "Jackbox-style multiplayer art auction game - Boðbjánar",
+  "description": "A Jackbox-style multiplayer web game where players create art and bid on each other's creations in a real-time auction.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bodbjanar/bodbjanar.git"
+  },
   "keywords": [
     "game",
     "multiplayer",
     "socket.io",
-    "auction"
+    "auction",
+    "art",
+    "party-game"
   ],
-  "author": "",
+  "author": "Boðbjánar Contributors",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
