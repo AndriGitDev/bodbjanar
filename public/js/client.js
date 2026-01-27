@@ -1,3 +1,8 @@
+/**
+ * Boðbjánar - Client Side Logic
+ * Handles player interactions, drawing canvas, and real-time game updates.
+ */
+
 // Connect to Socket.io server
 const socket = io();
 
@@ -305,56 +310,88 @@ function setupSocketListeners() {
   socket.on('round_result', (data) => {
     document.getElementById('resultArtworkPlayer').src = data.artwork.imageData;
 
-    let message = '';
+    const resultMessage = document.getElementById('resultMessage');
+    resultMessage.innerHTML = ''; // Clear existing content safely
+
     if (data.soldTo) {
-      message = `Sold to ${data.soldTo} for $${data.soldPrice}!<br>`;
-      message += `True Value: $${data.artwork.trueValue}<br>`;
+      const p1 = document.createElement('p');
+      p1.textContent = `Sold to ${data.soldTo} for $${data.soldPrice}!`;
+
+      const p2 = document.createElement('p');
+      p2.textContent = `True Value: $${data.artwork.trueValue}`;
+
+      const p3 = document.createElement('p');
       if (data.profit > 0) {
-        message += `<span style="color: #4CAF50;">Profit: +$${data.profit}</span>`;
+        p3.style.color = '#4CAF50';
+        p3.textContent = `Profit: +$${data.profit}`;
       } else if (data.profit < 0) {
-        message += `<span style="color: #f44336;">Loss: -$${Math.abs(data.profit)}</span>`;
+        p3.style.color = '#f44336';
+        p3.textContent = `Loss: -$${Math.abs(data.profit)}`;
       } else {
-        message += `Break even!`;
+        p3.textContent = `Break even!`;
       }
+
+      resultMessage.appendChild(p1);
+      resultMessage.appendChild(p2);
+      resultMessage.appendChild(p3);
     } else {
-      message = 'No bids placed. Artwork remains unsold.';
+      resultMessage.textContent = 'No bids placed. Artwork remains unsold.';
     }
 
-    document.getElementById('resultMessage').innerHTML = message;
     switchScreen('result');
   });
 
   // Game over
   socket.on('game_over', (data) => {
     const resultsContent = document.getElementById('finalResultsContent');
+    resultsContent.innerHTML = '';
 
-    let html = '<div style="margin-bottom: 20px;">';
+    const container = document.createElement('div');
+    container.style.marginBottom = '20px';
 
     data.results.forEach((result, index) => {
       const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
       const isYou = result.name === playerInfo.name;
 
-      html += `
-        <div style="background: rgba(255,255,255,${isYou ? '0.4' : '0.2'}); padding: 15px; border-radius: 10px; margin-bottom: 10px; ${isYou ? 'border: 3px solid #ffd700;' : ''}">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong style="font-size: 1.3rem;">${medal} ${result.name} ${isYou ? '(You)' : ''}</strong>
-              <p style="margin: 5px 0; font-size: 0.9rem;">
-                Cash: $${result.cash} | Portfolio: $${result.portfolioValue}
-              </p>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-size: 1.5rem; font-weight: bold; color: #ffd700;">$${result.netWorth}</div>
-              <div style="font-size: 0.9rem;">${result.artworkCount} artworks</div>
-            </div>
-          </div>
-        </div>
-      `;
+      const card = document.createElement('div');
+      card.style.cssText = `background: rgba(255,255,255,${isYou ? '0.4' : '0.2'}); padding: 15px; border-radius: 10px; margin-bottom: 10px; ${isYou ? 'border: 3px solid #ffd700;' : ''}`;
+
+      const flex = document.createElement('div');
+      flex.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
+
+      const left = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.style.fontSize = '1.3rem';
+      strong.textContent = `${medal} ${result.name} ${isYou ? '(You)' : ''}`;
+
+      const p = document.createElement('p');
+      p.style.cssText = "margin: 5px 0; font-size: 0.9rem;";
+      p.textContent = `Cash: $${result.cash} | Portfolio: $${result.portfolioValue}`;
+
+      left.appendChild(strong);
+      left.appendChild(p);
+
+      const right = document.createElement('div');
+      right.style.textAlign = 'right';
+
+      const worth = document.createElement('div');
+      worth.style.cssText = "font-size: 1.5rem; font-weight: bold; color: #ffd700;";
+      worth.textContent = `$${result.netWorth}`;
+
+      const count = document.createElement('div');
+      count.style.fontSize = '0.9rem';
+      count.textContent = `${result.artworkCount} artworks`;
+
+      right.appendChild(worth);
+      right.appendChild(count);
+
+      flex.appendChild(left);
+      flex.appendChild(right);
+      card.appendChild(flex);
+      container.appendChild(card);
     });
 
-    html += '</div>';
-
-    resultsContent.innerHTML = html;
+    resultsContent.appendChild(container);
     switchScreen('finalResults');
   });
 
@@ -381,14 +418,19 @@ document.getElementById('bid500Btn').addEventListener('click', () => {
   socket.emit('place_bid', { amount: 500 });
 });
 
-// Helper: Switch screen
+/**
+ * Switches the currently visible screen.
+ * @param {string} screenName - The name of the screen to show.
+ */
 function switchScreen(screenName) {
   Object.values(screens).forEach(screen => screen.classList.add('hidden'));
   screens[screenName].classList.remove('hidden');
   currentState = screenName;
 }
 
-// Helper: Update prompt display
+/**
+ * Updates the prompt text and progress indicator on the drawing screen.
+ */
 function updatePromptDisplay() {
   const promptElement = document.getElementById('currentPrompt');
   const progressElement = document.getElementById('promptProgress');

@@ -1,3 +1,8 @@
+/**
+ * Boðbjánar - Host Side Logic
+ * Handles room management, game phase transitions, and auction display.
+ */
+
 // Connect to Socket.io server
 const socket = io();
 
@@ -10,7 +15,11 @@ let totalArtworks = 0;
 // Audio context for sound effects
 let audioContext = null;
 
-// Helper: Play countdown beep
+/**
+ * Plays a beep sound using the Web Audio API.
+ * @param {number} frequency - The frequency in Hz.
+ * @param {number} duration - The duration in ms.
+ */
 function playBeep(frequency = 800, duration = 100) {
   if (!audioContext) {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -239,12 +248,29 @@ function updatePlayersDisplay() {
     const card = document.createElement('div');
     card.className = 'player-card';
     const lotNumber = String(index + 1).padStart(3, '0');
-    card.innerHTML = `
-      <img src="${player.avatar}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: var(--space-sm); border: 2px solid var(--auction-gold);">
-      <h4>${player.name}</h4>
-      <p class="lot-number">LOT #${lotNumber}</p>
-      <p style="margin-top: var(--space-xs); color: var(--success-green); font-family: var(--font-accent); font-weight: 600;">$${player.cash}</p>
-    `;
+
+    // Use proper DOM manipulation to avoid XSS
+    const img = document.createElement('img');
+    img.src = player.avatar;
+    img.alt = player.name;
+    img.style.cssText = "width: 60px; height: 60px; border-radius: 50%; margin-bottom: var(--space-sm); border: 2px solid var(--auction-gold);";
+
+    const h4 = document.createElement('h4');
+    h4.textContent = player.name;
+
+    const pLot = document.createElement('p');
+    pLot.className = 'lot-number';
+    pLot.textContent = `LOT #${lotNumber}`;
+
+    const pCash = document.createElement('p');
+    pCash.style.cssText = "margin-top: var(--space-xs); color: var(--success-green); font-family: var(--font-accent); font-weight: 600;";
+    pCash.textContent = `$${player.cash}`;
+
+    card.appendChild(img);
+    card.appendChild(h4);
+    card.appendChild(pLot);
+    card.appendChild(pCash);
+
     playersGrid.appendChild(card);
   });
 }
@@ -261,21 +287,38 @@ function displayLeaderboard(results) {
     // Use Roman numerals for top 3, numbers for rest
     const rankDisplay = index === 0 ? 'I' : index === 1 ? 'II' : index === 2 ? 'III' : index + 1;
 
-    item.innerHTML = `
-      <div class="rank">${rankDisplay}</div>
-      <div class="player-info">
-        <h3>${result.name}</h3>
-        <p style="margin: var(--space-xs) 0; color: var(--warm-gray); font-size: 0.875rem; letter-spacing: 0.03em;">
-          Cash: <span style="color: var(--warm-white);">$${result.cash}</span> |
-          Portfolio: <span style="color: var(--warm-white);">$${result.portfolioValue}</span> |
-          Artworks: <span style="color: var(--warm-white);">${result.artworkCount}</span>
-        </p>
-      </div>
-      <div class="score-info">
-        <div class="net-worth">$${result.netWorth}</div>
-        <div style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-gray); margin-top: var(--space-xs);">Net Worth</div>
-      </div>
+    // Use safe DOM manipulation
+    const rankDiv = document.createElement('div');
+    rankDiv.className = 'rank';
+    rankDiv.textContent = rankDisplay;
+
+    const playerInfoDiv = document.createElement('div');
+    playerInfoDiv.className = 'player-info';
+
+    const h3 = document.createElement('h3');
+    h3.textContent = result.name;
+
+    const pInfo = document.createElement('p');
+    pInfo.style.cssText = "margin: var(--space-xs) 0; color: var(--warm-gray); font-size: 0.875rem; letter-spacing: 0.03em;";
+
+    // Numbers are safe to use in innerHTML, but textContent is used for the name above
+    pInfo.innerHTML = `Cash: <span style="color: var(--warm-white);">$${result.cash}</span> |
+                       Portfolio: <span style="color: var(--warm-white);">$${result.portfolioValue}</span> |
+                       Artworks: <span style="color: var(--warm-white);">${result.artworkCount}</span>`;
+
+    playerInfoDiv.appendChild(h3);
+    playerInfoDiv.appendChild(pInfo);
+
+    const scoreInfoDiv = document.createElement('div');
+    scoreInfoDiv.className = 'score-info';
+    scoreInfoDiv.innerHTML = `
+      <div class="net-worth">$${result.netWorth}</div>
+      <div style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-gray); margin-top: var(--space-xs);">Net Worth</div>
     `;
+
+    item.appendChild(rankDiv);
+    item.appendChild(playerInfoDiv);
+    item.appendChild(scoreInfoDiv);
 
     leaderboardList.appendChild(item);
   });
